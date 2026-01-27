@@ -4,14 +4,18 @@ pub fn generate_css(theme: &Theme) -> String {
     let mut css = format!(
         r#"
 window {{
-    background-color: {bg};
+    background-color: rgba(0, 0, 0, 0);
 }}
 
-.grid-container {{
-    background-color: {bg};
-    border: 3px solid {border};
-    border-radius: 8px;
+frame, .grid-container {{
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
     padding: 12px;
+}}
+
+frame > border {{
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
 }}
 
 .grid-cell {{
@@ -38,27 +42,24 @@ window {{
     font-size: 11px;
 }}
 "#,
-        bg = theme.bg,
         border = theme.border,
         fg = theme.fg,
         fg_dim = theme.fg_dim,
     );
 
     // Generate accent color classes
+    let border = &theme.border;
     for (i, color) in theme.accents.iter().enumerate() {
         css.push_str(&format!(
             r#"
 .cell-accent-{i} {{
-    background-color: alpha({color}, 0.25);
-    border: 1px solid alpha({color}, 0.5);
-}}
-
-.cell-accent-{i}:hover {{
-    background-color: alpha({color}, 0.35);
+    background-color: {color};
+    border: 1px solid {color};
 }}
 
 .cell-accent-{i}.selected {{
-    background-color: alpha({color}, 0.4);
+    background-color: {color};
+    border: 2px solid {border};
 }}
 "#
         ));
