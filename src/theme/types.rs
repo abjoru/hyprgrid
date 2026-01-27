@@ -3,6 +3,7 @@ use serde::Deserialize;
 #[derive(Debug, Clone, Deserialize)]
 pub struct Theme {
     pub bg: String,
+    #[allow(dead_code)]
     pub bg_selected: String,
     pub border: String,
     pub fg: String,

@@ -19,6 +19,7 @@ pub type AppsConfig = HashMap<String, Vec<HashMap<String, Value>>>;
 
 #[derive(Debug, Clone)]
 pub struct FlatEntry {
+    #[allow(dead_code)]
     pub id: String,
     pub entry: AppEntry,
 }
@@ -29,9 +30,7 @@ impl FlatEntry {
             return vec![];
         };
 
-        apps.iter()
-            .filter_map(|item| Self::parse_item(item))
-            .collect()
+        apps.iter().filter_map(Self::parse_item).collect()
     }
 
     fn parse_item(item: &HashMap<String, Value>) -> Option<FlatEntry> {
