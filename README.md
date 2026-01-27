@@ -1,0 +1,120 @@
+# hyprgrid
+
+A dynamic grid-based application launcher for Hyprland, inspired by XMonad's GridSelect.
+
+![Gruvbox themed grid](https://img.shields.io/badge/theme-gruvbox-yellow)
+
+## Features
+
+- **YAML-based app config** - Define apps by category
+- **Vim-style navigation** - hjkl keys + arrows
+- **Gruvbox theming** - Customizable colors with cycling cell accents
+- **Layer-shell overlay** - Centered popup on focused monitor
+- **Terminal app support** - Launch TUI apps in your preferred terminal
+
+## Installation
+
+### Dependencies (Arch)
+
+```bash
+sudo pacman -S gtk4 gtk4-layer-shell
+```
+
+### Build
+
+```bash
+cargo build -r
+cp target/release/hyprgrid ~/.local/bin/
+```
+
+## Usage
+
+```bash
+hyprgrid -c <category>
+hyprgrid -c favorites
+hyprgrid -c system --terminal "alacritty -e"
+hyprgrid -c internet --config ~/my/apps.yaml
+```
+
+### Keybindings
+
+| Key | Action |
+|-----|--------|
+| h / ← | Move left |
+| l / → | Move right |
+| k / ↑ | Move up |
+| j / ↓ | Move down |
+| Enter | Launch app |
+| Escape / q | Close |
+
+## Configuration
+
+### Apps Config
+
+Default locations (in order):
+1. `--config` flag
+2. `~/.config/hyprgrid/apps.yaml`
+3. `~/.config/xmonad/applications.yaml`
+
+```yaml
+favorites:
+  - firefox:
+    name: 'Firefox'
+    description: 'Web browser'
+    command: 'firefox'
+  - htop:
+    name: 'HTop'
+    description: 'Process monitor'
+    terminal: 'htop'
+
+system:
+  - alacritty:
+    name: 'Alacritty'
+    command: 'alacritty'
+```
+
+### Theme Config
+
+`~/.config/hyprgrid/config.yaml`:
+
+```yaml
+theme:
+  bg: "#282828"
+  bg_selected: "#3c3836"
+  border: "#d79921"
+  fg: "#ebdbb2"
+  fg_dim: "#a89984"
+  accents:
+    - "#458588"  # blue
+    - "#b16286"  # purple
+    - "#689d6a"  # aqua
+```
+
+Default theme is Gruvbox Dark.
+
+## Hyprland Integration
+
+Add to `~/.config/hypr/hyprland.conf`:
+
+```conf
+bind = $mainMod, G, exec, hyprgrid -c favorites
+bind = $mainMod SHIFT, G, exec, hyprgrid -c system
+```
+
+## Roadmap
+
+- [x] YAML config parsing
+- [x] Grid layout with dynamic sizing
+- [x] Vim-style keyboard navigation
+- [x] Layer-shell overlay
+- [x] Gruvbox theming with accent colors
+- [x] Terminal app support
+- [ ] Search/filter as you type
+- [ ] Window switcher mode (Hyprland IPC)
+- [ ] .desktop file parsing
+- [ ] Icon support
+- [ ] Mouse support
+
+## License
+
+MIT
