@@ -11,20 +11,21 @@ env:
 jobs:
   release:
     runs-on: ubuntu-latest
+    container: archlinux:latest
 
     permissions:
       contents: write
 
     steps:
-      - uses: actions/checkout@v4
-
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-4-dev libgtk-4-layer-shell-dev
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm git base-devel rustup gtk4 gtk4-layer-shell
+
+      - uses: actions/checkout@v4
 
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+        run: rustup default stable
 
       - name: Build release
         run: cargo build --release
@@ -33,7 +34,7 @@ jobs:
         run: |
           mkdir -p release
           cp target/release/hyprgrid release/
-          cp README.md LICENSE* release/ 2>/dev/null || cp README.md release/
+          cp README.md LICENSE release/
           tar -czvf hyprgrid-${{ github.ref_name }}-x86_64-linux.tar.gz -C release .
 
       - name: Create GitHub Release

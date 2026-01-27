@@ -12,28 +12,18 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: archlinux:latest
 
     steps:
-      - uses: actions/checkout@v4
-
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-4-dev libgtk-4-layer-shell-dev
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm git base-devel rustup gtk4 gtk4-layer-shell
+
+      - uses: actions/checkout@v4
 
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache cargo
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        run: rustup default stable
 
       - name: Check formatting
         run: cargo fmt --check
