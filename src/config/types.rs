@@ -43,7 +43,9 @@ impl FlatEntry {
             .map(|(k, _)| k.clone())?;
 
         let name = item.get("name").and_then(|v| v.as_str())?.to_string();
-        let description = item.get("description").and_then(|v| v.as_str().map(String::from));
+        let description = item
+            .get("description")
+            .and_then(|v| v.as_str().map(String::from));
 
         let launch = if let Some(cmd) = item.get("terminal").and_then(|v| v.as_str()) {
             LaunchType::Terminal(cmd.to_string())
