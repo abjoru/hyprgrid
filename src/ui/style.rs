@@ -20,6 +20,7 @@ frame > border {{
 
 .grid-cell {{
     border-radius: 6px;
+    border: 1px solid {fg_dim};
     padding: 10px;
     min-width: 180px;
     min-height: 60px;
@@ -49,12 +50,13 @@ frame > border {{
 
     // Generate accent color classes
     let border = &theme.border;
+    let fg_dim = &theme.fg_dim;
     for (i, color) in theme.accents.iter().enumerate() {
         css.push_str(&format!(
             r#"
 .cell-accent-{i} {{
     background-color: {color};
-    border: 1px solid {color};
+    border: 1px solid {fg_dim};
 }}
 
 .cell-accent-{i}.selected {{

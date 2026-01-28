@@ -16,12 +16,12 @@ pub struct Theme {
 
 fn default_accents() -> Vec<String> {
     vec![
-        "#076678".into(), // gruvbox faded blue
-        "#8f3f71".into(), // gruvbox faded purple
-        "#427b58".into(), // gruvbox faded aqua
-        "#79740e".into(), // gruvbox faded green
-        "#b57614".into(), // gruvbox faded yellow
-        "#af3a03".into(), // gruvbox faded orange
+        "#043d48".into(), // gruvbox dark blue
+        "#562544".into(), // gruvbox dark purple
+        "#284935".into(), // gruvbox dark aqua
+        "#494608".into(), // gruvbox dark green
+        "#6d470c".into(), // gruvbox dark yellow
+        "#692302".into(), // gruvbox dark orange
     ]
 }
 
