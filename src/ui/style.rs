@@ -24,10 +24,12 @@ frame > border {{
     padding: 10px;
     min-width: 180px;
     min-height: 60px;
+    opacity: 0.65;
     transition: all 150ms ease-in-out;
 }}
 
 .grid-cell.selected {{
+    opacity: 1.0;
     border: 2px solid {border};
     box-shadow: 0 0 8px alpha({border}, 0.5);
 }}
