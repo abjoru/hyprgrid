@@ -10,8 +10,9 @@ pub fn create_cell(entry: &FlatEntry, accent_class: &str, icon_size: u32) -> Gtk
 
     // Icon (optional)
     if let Some(icon_str) = &entry.entry.icon {
-        let image = if icon_str.starts_with('/') {
-            Image::from_file(icon_str)
+        let expanded = shellexpand::tilde(icon_str);
+        let image = if expanded.starts_with('/') {
+            Image::from_file(expanded.as_ref())
         } else {
             Image::from_icon_name(icon_str)
         };
