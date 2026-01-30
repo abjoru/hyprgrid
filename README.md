@@ -113,10 +113,9 @@ bind = $mainMod SHIFT, G, exec, hyprgrid -c system
 - [x] Layer-shell overlay
 - [x] Gruvbox theming with accent colors
 - [x] Terminal app support
-- [ ] Search/filter as you type
 - [ ] Window switcher mode (Hyprland IPC)
-- [ ] .desktop file parsing
-- [ ] Icon support
+- [x] .desktop file parsing
+- [x] Icon support
 - [ ] Mouse support
 
 ## License
