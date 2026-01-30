@@ -12,6 +12,7 @@ pub struct AppEntry {
     pub name: String,
     pub description: Option<String>,
     pub launch: LaunchType,
+    pub icon: Option<String>,
 }
 
 /// YAML structure: { "category": [ { "id": null, "name": "...", "command"/"terminal": "..." } ] }
@@ -35,7 +36,7 @@ impl FlatEntry {
 
     fn parse_item(item: &HashMap<String, Value>) -> Option<FlatEntry> {
         // Find the ID key (the one with null/empty value or first key that's not a known field)
-        let known_fields = ["name", "description", "command", "terminal"];
+        let known_fields = ["name", "description", "command", "terminal", "icon"];
         let id = item
             .iter()
             .find(|(k, _)| !known_fields.contains(&k.as_str()))
@@ -45,6 +46,7 @@ impl FlatEntry {
         let description = item
             .get("description")
             .and_then(|v| v.as_str().map(String::from));
+        let icon = item.get("icon").and_then(|v| v.as_str().map(String::from));
 
         let launch = if let Some(cmd) = item.get("terminal").and_then(|v| v.as_str()) {
             LaunchType::Terminal(cmd.to_string())
@@ -60,6 +62,7 @@ impl FlatEntry {
                 name,
                 description,
                 launch,
+                icon,
             },
         })
     }

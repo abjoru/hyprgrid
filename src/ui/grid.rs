@@ -155,7 +155,11 @@ impl GridState {
     }
 }
 
-pub fn build_grid(entries: Vec<FlatEntry>, num_accents: usize) -> (Frame, Rc<GridState>) {
+pub fn build_grid(
+    entries: Vec<FlatEntry>,
+    num_accents: usize,
+    icon_size: u32,
+) -> (Frame, Rc<GridState>) {
     let grid = Grid::new();
     grid.set_row_spacing(8);
     grid.set_column_spacing(8);
@@ -176,7 +180,7 @@ pub fn build_grid(entries: Vec<FlatEntry>, num_accents: usize) -> (Frame, Rc<Gri
     for (i, entry) in entries.iter().enumerate() {
         let ((x, y), layer) = coords[i];
         let accent = accent_class(layer, num_accents);
-        let cell = create_cell(entry, &accent);
+        let cell = create_cell(entry, &accent, icon_size);
 
         // Translate to positive grid coordinates
         let col = x - min_x;
