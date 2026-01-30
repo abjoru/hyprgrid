@@ -12,6 +12,18 @@ pub struct Theme {
     // Cell accent colors (cycle through these)
     #[serde(default = "default_accents")]
     pub accents: Vec<String>,
+    #[serde(default = "default_icon_size")]
+    pub icon_size: u32,
+    #[serde(default = "default_icons_enabled")]
+    pub icons_enabled: bool,
+}
+
+fn default_icon_size() -> u32 {
+    32
+}
+
+fn default_icons_enabled() -> bool {
+    true
 }
 
 fn default_accents() -> Vec<String> {
@@ -34,6 +46,8 @@ impl Default for Theme {
             fg: "#ebdbb2".into(),
             fg_dim: "#a89984".into(),
             accents: default_accents(),
+            icon_size: default_icon_size(),
+            icons_enabled: default_icons_enabled(),
         }
     }
 }

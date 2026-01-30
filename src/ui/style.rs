@@ -44,6 +44,10 @@ frame > border {{
     color: {fg_dim};
     font-size: 11px;
 }}
+
+.cell-icon {{
+    margin-right: 4px;
+}}
 "#,
         border = theme.border,
         fg = theme.fg,

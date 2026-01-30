@@ -13,6 +13,7 @@ use crate::ui::{build_grid, generate_css};
 pub struct AppConfig {
     pub entries: Vec<FlatEntry>,
     pub terminal: Option<String>,
+    pub icon_size: u32,
 }
 
 pub fn run(config: AppConfig) -> Result<()> {
@@ -22,6 +23,7 @@ pub fn run(config: AppConfig) -> Result<()> {
 
     let entries = Rc::new(config.entries);
     let terminal = config.terminal;
+    let icon_size = config.icon_size;
 
     app.connect_activate(move |app| {
         let theme = load_theme();
@@ -53,7 +55,7 @@ pub fn run(config: AppConfig) -> Result<()> {
         window.set_anchor(Edge::Right, false);
 
         // Build grid
-        let (container, state) = build_grid(entries.as_ref().clone(), num_accents);
+        let (container, state) = build_grid(entries.as_ref().clone(), num_accents, icon_size);
         window.set_child(Some(&container));
 
         // Keyboard handling
