@@ -1,6 +1,10 @@
-use crate::theme::Theme;
+use crate::theme::{Theme, desaturate};
 
 pub fn generate_css(theme: &Theme) -> String {
+    let dim = theme.dim_strength;
+    let fg_dimmed = desaturate(&theme.fg, dim);
+    let fg_dim_dimmed = desaturate(&theme.fg_dim, dim);
+
     let mut css = format!(
         r#"
 window {{
@@ -24,25 +28,31 @@ frame > border {{
     padding: 10px;
     min-width: 180px;
     min-height: 60px;
-    opacity: 0.65;
     transition: all 150ms ease-in-out;
 }}
 
 .grid-cell.selected {{
-    opacity: 1.0;
     border: 2px solid {border};
     box-shadow: 0 0 8px alpha({border}, 0.5);
 }}
 
-.cell-name {{
-    color: {fg};
+.grid-cell .cell-name {{
+    color: {fg_dimmed};
     font-weight: bold;
     font-size: 14px;
 }}
 
-.cell-desc {{
-    color: {fg_dim};
+.grid-cell.selected .cell-name {{
+    color: {fg};
+}}
+
+.grid-cell .cell-desc {{
+    color: {fg_dim_dimmed};
     font-size: 11px;
+}}
+
+.grid-cell.selected .cell-desc {{
+    color: {fg_dim};
 }}
 
 .cell-icon {{
@@ -52,16 +62,19 @@ frame > border {{
         border = theme.border,
         fg = theme.fg,
         fg_dim = theme.fg_dim,
+        fg_dimmed = fg_dimmed,
+        fg_dim_dimmed = fg_dim_dimmed,
     );
 
-    // Generate accent color classes
+    // Generate accent color classes with dimmed variants for unselected
     let border = &theme.border;
     let fg_dim = &theme.fg_dim;
     for (i, color) in theme.accents.iter().enumerate() {
+        let dimmed = desaturate(color, dim);
         css.push_str(&format!(
             r#"
 .cell-accent-{i} {{
-    background-color: {color};
+    background-color: {dimmed};
     border: 1px solid {fg_dim};
 }}
 

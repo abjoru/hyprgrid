@@ -15,6 +15,7 @@ A dynamic grid-based application launcher for Hyprland, inspired by XMonad's Gri
 - **Gruvbox theming** - Customizable colors with cycling cell accents
 - **Layer-shell overlay** - Centered popup on focused monitor
 - **Terminal app support** - Launch TUI apps in your preferred terminal
+- **Icon support** - Per-app icons via icon name or file path
 
 ## Installation
 
@@ -66,10 +67,12 @@ favorites:
     name: 'Firefox'
     description: 'Web browser'
     command: 'firefox'
+    icon: 'firefox'              # icon name from theme
   - htop:
     name: 'HTop'
     description: 'Process monitor'
     terminal: 'htop'
+    icon: '~/.icons/htop.png'    # or absolute/tilde path
 
 system:
   - alacritty:
@@ -92,6 +95,9 @@ theme:
     - "#458588"  # blue
     - "#b16286"  # purple
     - "#689d6a"  # aqua
+  icons_enabled: true   # enable/disable icons (default: true)
+  icon_size: 32         # icon size in pixels (default: 32)
+  dim_strength: 0.8     # desaturation of unselected cells, 0.0-1.0 (default: 0.8)
 ```
 
 Default theme is Gruvbox Dark.
