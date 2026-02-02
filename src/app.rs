@@ -72,10 +72,10 @@ pub fn run(config: AppConfig) -> Result<()> {
                 Action::MoveDown => state_clone.move_selection(0, 1),
                 Action::Launch => {
                     if let Some(entry) = state_clone.current_entry() {
-                        if let Err(e) = launch(entry, terminal_clone.as_deref()) {
-                            log::error!("Failed to launch: {}", e);
+                        match launch(entry, terminal_clone.as_deref()) {
+                            Ok(_) => window_clone.close(),
+                            Err(e) => log::error!("Launch failed: {}", e),
                         }
-                        window_clone.close();
                     }
                 }
                 Action::Close => window_clone.close(),
