@@ -16,6 +16,7 @@ A dynamic grid-based application launcher for Hyprland, inspired by XMonad's Gri
 - **Layer-shell overlay** - Centered popup on focused monitor
 - **Terminal app support** - Launch TUI apps in your preferred terminal
 - **Icon support** - Per-app icons via icon name or file path
+- **Launch error notifications** - Desktop notifications for missing or failed apps
 
 ## Installation
 
