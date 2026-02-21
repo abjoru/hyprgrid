@@ -8,47 +8,27 @@ use crate::theme::Theme;
 pub struct ConfigFile {
     #[serde(default)]
     pub theme: Option<Theme>,
+    #[serde(default)]
+    pub apps: AppsConfig,
 }
 
-pub fn find_apps_config(explicit: Option<&str>) -> Result<PathBuf> {
+pub fn find_config(explicit: Option<&str>) -> Result<PathBuf> {
     if let Some(path) = explicit {
         let expanded = shellexpand::tilde(path);
         return Ok(PathBuf::from(expanded.as_ref()));
     }
 
-    let candidates = [
-        dirs::config_dir().map(|p| p.join("hyprgrid/apps.yaml")),
-        dirs::config_dir().map(|p| p.join("xmonad/applications.yaml")),
-    ];
+    let candidate = dirs::config_dir().map(|p| p.join("hyprgrid/config.toml"));
 
-    for candidate in candidates.into_iter().flatten() {
-        if candidate.exists() {
-            return Ok(candidate);
-        }
+    if let Some(path) = candidate.filter(|p| p.exists()) {
+        return Ok(path);
     }
 
-    anyhow::bail!("No apps config found. Create ~/.config/hyprgrid/apps.yaml or use --config")
+    anyhow::bail!("No config found. Create ~/.config/hyprgrid/config.toml or use --config")
 }
 
-pub fn find_theme_config() -> Option<PathBuf> {
-    dirs::config_dir()
-        .map(|p| p.join("hyprgrid/config.yaml"))
-        .filter(|p| p.exists())
-}
-
-pub fn load_apps(path: &PathBuf) -> Result<AppsConfig> {
+pub fn load_config(path: &PathBuf) -> Result<ConfigFile> {
     let content = std::fs::read_to_string(path)
         .with_context(|| format!("Failed to read {}", path.display()))?;
-    serde_yaml::from_str(&content).with_context(|| format!("Failed to parse {}", path.display()))
-}
-
-pub fn load_theme() -> Theme {
-    find_theme_config()
-        .and_then(|path| {
-            std::fs::read_to_string(&path)
-                .ok()
-                .and_then(|content| serde_yaml::from_str::<ConfigFile>(&content).ok())
-                .and_then(|cfg| cfg.theme)
-        })
-        .unwrap_or_default()
+    toml::from_str(&content).with_context(|| format!("Failed to parse {}", path.display()))
 }

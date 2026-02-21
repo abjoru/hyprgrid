@@ -10,7 +10,7 @@ license = "MIT"
 gtk4 = "0.9"
 gtk4-layer-shell = "0.4"
 serde = { version = "1.0", features = ["derive"] }
-serde_yaml = "0.9"
+toml = "0.8"
 clap = { version = "4.5", features = ["derive"] }
 dirs = "6.0"
 anyhow = "1.0"

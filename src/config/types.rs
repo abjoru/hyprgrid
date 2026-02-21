@@ -1,4 +1,4 @@
-use serde_yaml::Value;
+use serde::Deserialize;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -15,8 +15,20 @@ pub struct AppEntry {
     pub icon: Option<String>,
 }
 
-/// YAML structure: { "category": [ { "id": null, "name": "...", "command"/"terminal": "..." } ] }
-pub type AppsConfig = HashMap<String, Vec<HashMap<String, Value>>>;
+#[derive(Debug, Clone, Deserialize)]
+pub struct AppDef {
+    pub id: String,
+    pub name: String,
+    #[serde(default)]
+    pub description: Option<String>,
+    #[serde(default)]
+    pub icon: Option<String>,
+    pub command: String,
+    #[serde(default)]
+    pub terminal: bool,
+}
+
+pub type AppsConfig = HashMap<String, Vec<AppDef>>;
 
 #[derive(Debug, Clone)]
 pub struct FlatEntry {
@@ -31,39 +43,24 @@ impl FlatEntry {
             return vec![];
         };
 
-        apps.iter().filter_map(Self::parse_item).collect()
-    }
+        apps.iter()
+            .map(|app| {
+                let launch = if app.terminal {
+                    LaunchType::Terminal(app.command.clone())
+                } else {
+                    LaunchType::Command(app.command.clone())
+                };
 
-    fn parse_item(item: &HashMap<String, Value>) -> Option<FlatEntry> {
-        // Find the ID key (the one with null/empty value or first key that's not a known field)
-        let known_fields = ["name", "description", "command", "terminal", "icon"];
-        let id = item
-            .iter()
-            .find(|(k, _)| !known_fields.contains(&k.as_str()))
-            .map(|(k, _)| k.clone())?;
-
-        let name = item.get("name").and_then(|v| v.as_str())?.to_string();
-        let description = item
-            .get("description")
-            .and_then(|v| v.as_str().map(String::from));
-        let icon = item.get("icon").and_then(|v| v.as_str().map(String::from));
-
-        let launch = if let Some(cmd) = item.get("terminal").and_then(|v| v.as_str()) {
-            LaunchType::Terminal(cmd.to_string())
-        } else if let Some(cmd) = item.get("command").and_then(|v| v.as_str()) {
-            LaunchType::Command(cmd.to_string())
-        } else {
-            return None;
-        };
-
-        Some(FlatEntry {
-            id,
-            entry: AppEntry {
-                name,
-                description,
-                launch,
-                icon,
-            },
-        })
+                FlatEntry {
+                    id: app.id.clone(),
+                    entry: AppEntry {
+                        name: app.name.clone(),
+                        description: app.description.clone(),
+                        launch,
+                        icon: app.icon.clone(),
+                    },
+                }
+            })
+            .collect()
     }
 }
