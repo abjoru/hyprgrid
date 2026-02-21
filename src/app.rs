@@ -5,15 +5,16 @@ use gtk4::{Application, ApplicationWindow, CssProvider};
 use gtk4_layer_shell::{Edge, Layer, LayerShell};
 use std::rc::Rc;
 
-use crate::config::{FlatEntry, load_theme};
+use crate::config::FlatEntry;
 use crate::input::{Action, parse_key};
 use crate::launcher::launch;
+use crate::theme::Theme;
 use crate::ui::{build_grid, generate_css};
 
 pub struct AppConfig {
     pub entries: Vec<FlatEntry>,
     pub terminal: Option<String>,
-    pub icon_size: u32,
+    pub theme: Theme,
 }
 
 pub fn run(config: AppConfig) -> Result<()> {
@@ -23,10 +24,9 @@ pub fn run(config: AppConfig) -> Result<()> {
 
     let entries = Rc::new(config.entries);
     let terminal = config.terminal;
-    let icon_size = config.icon_size;
+    let theme = config.theme;
 
     app.connect_activate(move |app| {
-        let theme = load_theme();
         let num_accents = theme.accents.len().max(1);
         let css = generate_css(&theme);
 
@@ -55,6 +55,7 @@ pub fn run(config: AppConfig) -> Result<()> {
         window.set_anchor(Edge::Right, false);
 
         // Build grid
+        let icon_size = theme.icon_size;
         let (container, state) = build_grid(entries.as_ref().clone(), num_accents, icon_size);
         window.set_child(Some(&container));
 

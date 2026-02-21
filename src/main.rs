@@ -8,7 +8,7 @@ mod ui;
 use anyhow::Result;
 use clap::Parser;
 
-use config::{FlatEntry, find_apps_config, load_apps, load_theme, resolve_icons};
+use config::{FlatEntry, find_config, load_config, resolve_icons};
 
 #[derive(Parser)]
 #[command(name = "hyprgrid")]
@@ -18,7 +18,7 @@ struct Cli {
     #[arg(short, long)]
     category: String,
 
-    /// Path to apps config file
+    /// Path to config file
     #[arg(long)]
     config: Option<String>,
 
@@ -35,14 +35,14 @@ fn main() -> Result<()> {
     env_logger::init();
 
     let cli = Cli::parse();
-    let theme = load_theme();
 
-    let config_path = find_apps_config(cli.config.as_deref())?;
+    let config_path = find_config(cli.config.as_deref())?;
     log::info!("Using config: {}", config_path.display());
 
-    let apps = load_apps(&config_path)?;
+    let cfg = load_config(&config_path)?;
+    let theme = cfg.theme.unwrap_or_default();
 
-    let mut entries = FlatEntry::flatten(&apps, &cli.category);
+    let mut entries = FlatEntry::flatten(&cfg.apps, &cli.category);
     if entries.is_empty() {
         anyhow::bail!("No apps found in category '{}'", cli.category);
     }
@@ -63,6 +63,6 @@ fn main() -> Result<()> {
     app::run(app::AppConfig {
         entries,
         terminal: cli.terminal,
-        icon_size: theme.icon_size,
+        theme,
     })
 }
