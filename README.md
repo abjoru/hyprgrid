@@ -1,6 +1,6 @@
 # hyprgrid
 
-[![Version](https://img.shields.io/badge/version-0.1.6-blue)](https://github.com/abjoru/hyprgrid)
+[![Version](https://img.shields.io/badge/version-0.1.7-blue)](https://github.com/abjoru/hyprgrid)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![CI](https://github.com/abjoru/hyprgrid/actions/workflows/ci.yml/badge.svg)](https://github.com/abjoru/hyprgrid/actions/workflows/ci.yml)
 [![Rust](https://img.shields.io/badge/rust-2024_edition-orange)](https://www.rust-lang.org/)
