@@ -8,6 +8,8 @@
 
 A dynamic grid-based application launcher for Hyprland, inspired by XMonad's GridSelect.
 
+![hyprgrid screenshot](assets/screenshot.png)
+
 ## Features
 
 - **YAML-based app config** - Define apps by category
