@@ -1,0 +1,102 @@
+[theme]
+bg = "#282828"
+bg_selected = "#3c3836"
+border = "#d79921"
+fg = "#ebdbb2"
+fg_dim = "#a89984"
+accents = ["#043d48", "#562544", "#284935", "#494608", "#6d470c", "#692302"]
+icon_size = 32
+icons_enabled = true
+dim_strength = 0.8
+
+[[apps.demo]]
+id = "firefox"
+name = "Firefox"
+description = "Open source web browser"
+icon = "/usr/share/icons/Suru++-Dark/apps/64/firefox-3.0.svg"
+command = "firefox"
+
+[[apps.demo]]
+id = "brave"
+name = "Brave"
+description = "Privacy-focused browser"
+icon = "/usr/share/icons/Suru++-Dark/apps/64/brave-browser.svg"
+command = "brave"
+
+[[apps.demo]]
+id = "discord"
+name = "Discord"
+description = "Chat and voice"
+icon = "/usr/share/icons/Suru++-Dark/apps/64/com.discordapp.Discord.svg"
+command = "discord"
+
+[[apps.demo]]
+id = "signal"
+name = "Signal"
+description = "Encrypted messaging"
+icon = "/usr/share/icons/Suru++-Dark/apps/64/org.signal.Signal.svg"
+command = "signal-desktop"
+
+[[apps.demo]]
+id = "alacritty"
+name = "Alacritty"
+description = "Fast terminal emulator"
+icon = "/usr/share/icons/Suru++-Dark/apps/64/appimagekit-kitty.svg"
+command = "alacritty"
+
+[[apps.demo]]
+id = "dolphin"
+name = "Dolphin"
+description = "File manager"
+icon = "/usr/share/icons/Suru++-Dark/apps/64/system-file-manager.svg"
+command = "dolphin"
+
+[[apps.demo]]
+id = "steam"
+name = "Steam"
+description = "Game manager and store"
+icon = "/usr/share/icons/Suru++-Dark/apps/64/10B4_steam.0.svg"
+command = "steam"
+
+[[apps.demo]]
+id = "geary"
+name = "Geary"
+description = "Email client"
+icon = "/usr/share/icons/Suru++-Dark/apps/64/geary.svg"
+command = "geary"
+
+[[apps.demo]]
+id = "opera"
+name = "Opera"
+description = "Opera web browser"
+icon = "/usr/share/icons/Suru++-Dark/apps/64/opera-beta.svg"
+command = "opera"
+
+[[apps.demo]]
+id = "htop"
+name = "HTop"
+description = "Process monitor"
+icon = "/usr/share/icons/Suru++-Dark/apps/64/htop.svg"
+command = "htop"
+terminal = true
+
+[[apps.demo]]
+id = "virtualbox"
+name = "VirtualBox"
+description = "Virtualization tool"
+icon = "/usr/share/icons/Suru++-Dark/apps/64/virtualbox-ose.svg"
+command = "virtualbox"
+
+[[apps.demo]]
+id = "libreoffice"
+name = "LibreOffice"
+description = "Office suite"
+icon = "/usr/share/icons/Suru++-Dark/apps/64/libreoffice-base.svg"
+command = "libreoffice"
+
+[[apps.demo]]
+id = "evince"
+name = "Document Viewer"
+description = "PDF and document viewer"
+icon = "/usr/share/icons/Suru++-Dark/apps/64/evince.svg"
+command = "evince"

@@ -6,7 +6,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 OUTPUT="$SCRIPT_DIR/screenshot.png"
-DEMO_CONFIG="/tmp/hyprgrid-demo.toml"
+DEMO_CONFIG="$SCRIPT_DIR/demo-config.toml"
 EMPTY_WS="99"
 
 # Remember current workspace
