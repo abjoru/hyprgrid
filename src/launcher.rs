@@ -13,6 +13,9 @@ pub fn launch(entry: &FlatEntry, default_terminal: Option<&str>) -> Result<()> {
         }
     };
 
+    // Expand ~ to home directory
+    let cmd = expand_tilde(&cmd);
+
     // Extract the binary name to check availability
     let binary = cmd.split_whitespace().next().unwrap_or(&cmd);
 
@@ -32,6 +35,15 @@ pub fn launch(entry: &FlatEntry, default_terminal: Option<&str>) -> Result<()> {
             bail!(msg);
         }
     }
+}
+
+fn expand_tilde(path: &str) -> String {
+    if let Some(rest) = path.strip_prefix("~/")
+        && let Some(home) = std::env::var_os("HOME")
+    {
+        return format!("{}/{}", home.to_string_lossy(), rest);
+    }
+    path.to_owned()
 }
 
 fn which(binary: &str) -> Option<std::path::PathBuf> {
