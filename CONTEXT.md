@@ -1,0 +1,54 @@
+# hyprgrid
+
+Grid-based application launcher for Hyprland. Reads a TOML config of apps grouped into categories, packs the chosen category into a diamond-shaped grid, and launches the selected app.
+
+## Language
+
+**Entry**:
+A single launchable item — name, optional description/icon, and how to launch it.
+_Avoid_: app, item, button.
+
+**Category**:
+A named group of Entries selected at startup (e.g. `favorites`). Exactly one is displayed per run.
+_Avoid_: section, page, tab.
+
+**GridLayout**:
+The pure geometry of a launcher screen: the diamond packing of N Entries onto integer coordinates, the layer of each, the bounds, and the wrap-and-scan navigation between them. Knows only the count of Entries, never their contents — no GTK.
+_Avoid_: grid, geometry, map.
+
+**Layer**:
+The diamond ring an Entry sits on, counted outward from the centre (layer 0). Drives the Accent assigned to a Cell.
+_Avoid_: ring, level, row.
+
+**Direction**:
+A single navigation step — Left, Right, Up, or Down. The input vocabulary of `GridLayout::step`.
+_Avoid_: dx/dy, delta, vector.
+
+**Selection**:
+The GTK-side adapter over a GridLayout: holds the Cells, tracks the selected index, and repaints on each Direction step.
+_Avoid_: state, cursor.
+
+**Cell**:
+The GTK widget rendering one Entry at one coordinate, styled with an Accent.
+_Avoid_: tile, box, widget.
+
+**Accent**:
+A background colour assigned to a Cell by its Layer, cycling through the theme's accent palette.
+_Avoid_: colour, highlight.
+
+## Relationships
+
+- A **Category** contains one or more **Entries**
+- A **GridLayout** is built from a count of **Entries** and assigns each a coordinate and a **Layer**
+- A **Layer** maps to an **Accent**
+- A **Selection** wraps one **GridLayout** and renders one **Cell** per Entry
+- A **Direction** drives `GridLayout::step`, which the **Selection** uses to repaint
+
+## Example dialogue
+
+> **Dev:** "When I press right from the rightmost **Cell**, does the **Selection** know where to go?"
+> **Maintainer:** "No — the **Selection** asks the **GridLayout** to `step` Right. The **GridLayout** wraps to the opposite edge and scans for the next occupied coordinate, then hands back an index. The **Selection** just repaints that **Cell**."
+
+## Flagged ambiguities
+
+- "grid" was used for both the GTK `Grid` widget and the abstract packing — resolved: the pure packing/navigation is **GridLayout**; the GTK side is the **Selection** (holding **Cells**).

@@ -8,6 +8,7 @@ use std::rc::Rc;
 use crate::config::FlatEntry;
 use crate::input::{Action, parse_key};
 use crate::launcher::launch;
+use crate::layout::Direction;
 use crate::theme::Theme;
 use crate::ui::{build_grid, generate_css};
 
@@ -67,10 +68,10 @@ pub fn run(config: AppConfig) -> Result<()> {
 
         key_controller.connect_key_pressed(move |_, key, _, _| {
             match parse_key(key) {
-                Action::MoveLeft => state_clone.move_selection(-1, 0),
-                Action::MoveRight => state_clone.move_selection(1, 0),
-                Action::MoveUp => state_clone.move_selection(0, -1),
-                Action::MoveDown => state_clone.move_selection(0, 1),
+                Action::MoveLeft => state_clone.step(Direction::Left),
+                Action::MoveRight => state_clone.step(Direction::Right),
+                Action::MoveUp => state_clone.step(Direction::Up),
+                Action::MoveDown => state_clone.step(Direction::Down),
                 Action::Launch => {
                     if let Some(entry) = state_clone.current_entry() {
                         match launch(entry, terminal_clone.as_deref()) {
