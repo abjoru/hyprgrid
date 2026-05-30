@@ -51,8 +51,7 @@ fn main() -> Result<()> {
     // Resolve icons from .desktop files
     let icons_enabled = !cli.no_icons && theme.icons_enabled;
     if icons_enabled {
-        let scanned = resolve_icons(&mut entries);
-        log::info!("Resolved icons from {} .desktop entries", scanned);
+        resolve_icons(&mut entries);
     }
 
     log::info!(
