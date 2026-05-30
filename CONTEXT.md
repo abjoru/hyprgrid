@@ -20,8 +20,12 @@ _Avoid_: section, page, tab.
 The on-disk map of every Category to its EntryDefs; startup selects one.
 _Avoid_: apps, config.
 
+**Screen**:
+The resolved startup state — the selected Category's Entries plus the Theme, ready to hand to the GTK app. Assembled behind one seam (`Screen::resolve` does the I/O, `Screen::from_config` is the testable core).
+_Avoid_: state, config.
+
 **GridLayout**:
-The pure geometry of a launcher screen: the diamond packing of N Entries onto integer coordinates, the layer of each, the bounds, and the wrap-and-scan navigation between them. Knows only the count of Entries, never their contents — no GTK.
+The pure geometry of a launcher display: the diamond packing of N Entries onto integer coordinates, the layer of each, the bounds, and the wrap-and-scan navigation between them. Knows only the count of Entries, never their contents — no GTK.
 _Avoid_: grid, geometry, map.
 
 **Layer**:
@@ -50,6 +54,7 @@ _Avoid_: command, process, exec.
 
 ## Relationships
 
+- A **Screen** bundles one **Category**'s resolved **Entries** with the **Theme**
 - A **Category** contains one or more **Entries**
 - An **Entry**'s launch intent resolves to an **Invocation**, which is then run (the spawn can fail; resolving cannot)
 - A **GridLayout** is built from a count of **Entries** and assigns each a coordinate and a **Layer**

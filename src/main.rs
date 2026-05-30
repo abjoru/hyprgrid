@@ -3,13 +3,14 @@ mod config;
 mod input;
 mod launcher;
 mod layout;
+mod screen;
 mod theme;
 mod ui;
 
 use anyhow::Result;
 use clap::Parser;
 
-use config::{entries_for_category, find_config, load_config, resolve_icons};
+use screen::Screen;
 
 #[derive(Parser)]
 #[command(name = "hyprgrid")]
@@ -37,32 +38,11 @@ fn main() -> Result<()> {
 
     let cli = Cli::parse();
 
-    let config_path = find_config(cli.config.as_deref())?;
-    log::info!("Using config: {}", config_path.display());
-
-    let cfg = load_config(&config_path)?;
-    let theme = cfg.theme.unwrap_or_default();
-
-    let mut entries = entries_for_category(&cfg.apps, &cli.category);
-    if entries.is_empty() {
-        anyhow::bail!("No apps found in category '{}'", cli.category);
-    }
-
-    // Resolve icons from .desktop files
-    let icons_enabled = !cli.no_icons && theme.icons_enabled;
-    if icons_enabled {
-        resolve_icons(&mut entries);
-    }
-
-    log::info!(
-        "Found {} apps in category '{}'",
-        entries.len(),
-        cli.category
-    );
+    let screen = Screen::resolve(cli.config.as_deref(), &cli.category, !cli.no_icons)?;
 
     app::run(app::AppConfig {
-        entries,
+        entries: screen.entries,
         terminal: cli.terminal,
-        theme,
+        theme: screen.theme,
     })
 }
