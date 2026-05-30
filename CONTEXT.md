@@ -5,12 +5,20 @@ Grid-based application launcher for Hyprland. Reads a TOML config of apps groupe
 ## Language
 
 **Entry**:
-A single launchable item — name, optional description/icon, and how to launch it.
+A single launchable item — id, name, optional description/icon, and how to launch it. Its TOML wire form is an **EntryDef**.
 _Avoid_: app, item, button.
+
+**EntryDef**:
+The TOML wire shape of an Entry (a flat `command` + `terminal` bool) that `From<EntryDef>` fuses into the launch intent. Deserialization-only.
+_Avoid_: raw entry, config struct.
 
 **Category**:
 A named group of Entries selected at startup (e.g. `favorites`). Exactly one is displayed per run.
 _Avoid_: section, page, tab.
+
+**CategoryMap**:
+The on-disk map of every Category to its EntryDefs; startup selects one.
+_Avoid_: apps, config.
 
 **GridLayout**:
 The pure geometry of a launcher screen: the diamond packing of N Entries onto integer coordinates, the layer of each, the bounds, and the wrap-and-scan navigation between them. Knows only the count of Entries, never their contents — no GTK.

@@ -1,15 +1,15 @@
 use gtk4::prelude::*;
 use gtk4::{Box as GtkBox, Image, Label, Orientation};
 
-use crate::config::FlatEntry;
+use crate::config::Entry;
 
-pub fn create_cell(entry: &FlatEntry, accent_class: &str, icon_size: u32) -> GtkBox {
+pub fn create_cell(entry: &Entry, accent_class: &str, icon_size: u32) -> GtkBox {
     let container = GtkBox::new(Orientation::Horizontal, 8);
     container.add_css_class("grid-cell");
     container.add_css_class(accent_class);
 
     // Icon (optional)
-    if let Some(icon_str) = &entry.entry.icon {
+    if let Some(icon_str) = &entry.icon {
         let expanded = shellexpand::tilde(icon_str);
         let image = if expanded.starts_with('/') {
             Image::from_file(expanded.as_ref())
@@ -26,13 +26,13 @@ pub fn create_cell(entry: &FlatEntry, accent_class: &str, icon_size: u32) -> Gtk
     let text_box = GtkBox::new(Orientation::Vertical, 4);
     text_box.set_hexpand(true);
 
-    let name_label = Label::new(Some(&entry.entry.name));
+    let name_label = Label::new(Some(&entry.name));
     name_label.add_css_class("cell-name");
     name_label.set_halign(gtk4::Align::Start);
     name_label.set_ellipsize(gtk4::pango::EllipsizeMode::End);
     text_box.append(&name_label);
 
-    if let Some(desc) = &entry.entry.description {
+    if let Some(desc) = &entry.description {
         let desc_label = Label::new(Some(desc));
         desc_label.add_css_class("cell-desc");
         desc_label.set_halign(gtk4::Align::Start);

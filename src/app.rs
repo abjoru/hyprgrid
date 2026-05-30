@@ -6,7 +6,7 @@ use gtk4_layer_shell::{Edge, Layer, LayerShell};
 use notify_rust::Notification;
 use std::rc::Rc;
 
-use crate::config::FlatEntry;
+use crate::config::Entry;
 use crate::input::{Action, parse_key};
 use crate::launcher::{self, Invocation, LaunchError};
 use crate::layout::Direction;
@@ -14,7 +14,7 @@ use crate::theme::Theme;
 use crate::ui::{build_grid, generate_css};
 
 pub struct AppConfig {
-    pub entries: Vec<FlatEntry>,
+    pub entries: Vec<Entry>,
     pub terminal: Option<String>,
     pub theme: Theme,
 }
@@ -77,13 +77,13 @@ pub fn run(config: AppConfig) -> Result<()> {
                     if let Some(entry) = state_clone.current_entry() {
                         let home = std::env::var("HOME").ok();
                         let inv = Invocation::resolve(
-                            &entry.entry.launch,
+                            &entry.launch,
                             terminal_clone.as_deref(),
                             home.as_deref(),
                         );
                         match launcher::run(&inv) {
                             Ok(_) => window_clone.close(),
-                            Err(e) => report_launch_error(&entry.entry.name, &e),
+                            Err(e) => report_launch_error(&entry.name, &e),
                         }
                     }
                 }

@@ -9,7 +9,7 @@ mod ui;
 use anyhow::Result;
 use clap::Parser;
 
-use config::{FlatEntry, find_config, load_config, resolve_icons};
+use config::{entries_for_category, find_config, load_config, resolve_icons};
 
 #[derive(Parser)]
 #[command(name = "hyprgrid")]
@@ -43,7 +43,7 @@ fn main() -> Result<()> {
     let cfg = load_config(&config_path)?;
     let theme = cfg.theme.unwrap_or_default();
 
-    let mut entries = FlatEntry::flatten(&cfg.apps, &cli.category);
+    let mut entries = entries_for_category(&cfg.apps, &cli.category);
     if entries.is_empty() {
         anyhow::bail!("No apps found in category '{}'", cli.category);
     }

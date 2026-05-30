@@ -2,12 +2,12 @@ use std::path::Path;
 
 use freedesktop_desktop_entry::{DesktopEntry, Iter as DesktopIter, default_paths};
 
-use super::types::FlatEntry;
+use super::types::Entry;
 
 /// Resolve missing icons from .desktop files. Returns number of .desktop entries scanned.
-pub fn resolve_icons(entries: &mut [FlatEntry]) -> usize {
+pub fn resolve_icons(entries: &mut [Entry]) -> usize {
     // Skip scanning if all entries already have icons
-    if entries.iter().all(|e| e.entry.icon.is_some()) {
+    if entries.iter().all(|e| e.icon.is_some()) {
         return 0;
     }
 
@@ -15,7 +15,7 @@ pub fn resolve_icons(entries: &mut [FlatEntry]) -> usize {
     let count = desktop.len();
 
     for entry in entries.iter_mut() {
-        if entry.entry.icon.is_some() {
+        if entry.icon.is_some() {
             continue;
         }
 
@@ -27,7 +27,7 @@ pub fn resolve_icons(entries: &mut [FlatEntry]) -> usize {
             .or_else(|| desktop.iter().find(|d| d.exec_name.as_deref() == Some(&id)))
             .map(|d| d.icon.clone());
 
-        entry.entry.icon = icon;
+        entry.icon = icon;
     }
 
     count

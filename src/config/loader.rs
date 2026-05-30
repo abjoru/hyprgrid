@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use std::path::PathBuf;
 
-use super::types::AppsConfig;
+use super::types::CategoryMap;
 use crate::theme::Theme;
 
 #[derive(Debug, Default, serde::Deserialize)]
@@ -9,7 +9,7 @@ pub struct ConfigFile {
     #[serde(default)]
     pub theme: Option<Theme>,
     #[serde(default)]
-    pub apps: AppsConfig,
+    pub apps: CategoryMap,
 }
 
 pub fn find_config(explicit: Option<&str>) -> Result<PathBuf> {
