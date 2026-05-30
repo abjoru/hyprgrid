@@ -3,11 +3,12 @@ use gtk4::gdk::Display;
 use gtk4::prelude::*;
 use gtk4::{Application, ApplicationWindow, CssProvider};
 use gtk4_layer_shell::{Edge, Layer, LayerShell};
+use notify_rust::Notification;
 use std::rc::Rc;
 
 use crate::config::FlatEntry;
 use crate::input::{Action, parse_key};
-use crate::launcher::launch;
+use crate::launcher::{self, Invocation, LaunchError};
 use crate::layout::Direction;
 use crate::theme::Theme;
 use crate::ui::{build_grid, generate_css};
@@ -74,9 +75,15 @@ pub fn run(config: AppConfig) -> Result<()> {
                 Action::MoveDown => state_clone.step(Direction::Down),
                 Action::Launch => {
                     if let Some(entry) = state_clone.current_entry() {
-                        match launch(entry, terminal_clone.as_deref()) {
+                        let home = std::env::var("HOME").ok();
+                        let inv = Invocation::resolve(
+                            &entry.entry.launch,
+                            terminal_clone.as_deref(),
+                            home.as_deref(),
+                        );
+                        match launcher::run(&inv) {
                             Ok(_) => window_clone.close(),
-                            Err(e) => log::error!("Launch failed: {}", e),
+                            Err(e) => report_launch_error(&entry.entry.name, &e),
                         }
                     }
                 }
@@ -92,4 +99,27 @@ pub fn run(config: AppConfig) -> Result<()> {
 
     app.run_with_args::<&str>(&[]);
     Ok(())
+}
+
+/// Map a [`LaunchError`] to a desktop notification plus a log line. Owns all
+/// user-facing failure reporting so the launcher seam stays pure.
+fn report_launch_error(app_name: &str, err: &LaunchError) {
+    let msg = match err {
+        LaunchError::NotInstalled(binary) => {
+            format!("'{}' is not installed or not in PATH", binary)
+        }
+        LaunchError::Spawn(e) => format!("Failed to launch: {}", e),
+    };
+
+    log::error!("Launch failed for '{}': {}", app_name, msg);
+
+    if let Err(e) = Notification::new()
+        .summary(&format!("hyprgrid: {}", app_name))
+        .body(&msg)
+        .icon("dialog-error")
+        .timeout(5000)
+        .show()
+    {
+        log::error!("Failed to send notification: {}", e);
+    }
 }
