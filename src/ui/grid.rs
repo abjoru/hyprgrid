@@ -3,7 +3,7 @@ use gtk4::{Box as GtkBox, Frame, Grid};
 use std::cell::Cell;
 use std::rc::Rc;
 
-use crate::config::FlatEntry;
+use crate::config::Entry;
 use crate::layout::{Direction, GridLayout};
 
 use super::cell::{create_cell, set_selected};
@@ -13,7 +13,7 @@ use super::style::accent_class;
 /// index, asks the layout for the next index on each [`Direction`], and
 /// repaints the affected cells. Contains no packing or navigation math.
 pub struct Selection {
-    entries: Vec<FlatEntry>,
+    entries: Vec<Entry>,
     cells: Vec<GtkBox>,
     layout: GridLayout,
     /// Currently selected entry index.
@@ -21,7 +21,7 @@ pub struct Selection {
 }
 
 impl Selection {
-    fn new(entries: Vec<FlatEntry>, cells: Vec<GtkBox>, layout: GridLayout) -> Self {
+    fn new(entries: Vec<Entry>, cells: Vec<GtkBox>, layout: GridLayout) -> Self {
         Self {
             entries,
             cells,
@@ -52,13 +52,13 @@ impl Selection {
     }
 
     /// The currently selected entry, if any.
-    pub fn current_entry(&self) -> Option<&FlatEntry> {
+    pub fn current_entry(&self) -> Option<&Entry> {
         self.entries.get(self.selected.get())
     }
 }
 
 pub fn build_grid(
-    entries: Vec<FlatEntry>,
+    entries: Vec<Entry>,
     num_accents: usize,
     icon_size: u32,
 ) -> (Frame, Rc<Selection>) {
