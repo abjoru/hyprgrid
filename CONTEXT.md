@@ -52,11 +52,20 @@ _Avoid_: colour, highlight.
 A resolved, runnable command derived from an Entry's launch intent: the final tilde-expanded shell string plus the binary name to check on PATH. Pure and total — building one cannot fail; only running it can. Distinct from the launch *intent* (Terminal vs Command) and from the OS spawn mechanism that runs it.
 _Avoid_: command, process, exec.
 
+**CommandSource**:
+A Category whose Entries are produced dynamically by running a command at startup and parsing its JSON stdout as EntryDefs, rather than listing EntryDefs statically. Declared under `[commands.<category>]` with a `command` field. A static `[[apps.<category>]]` of the same name takes precedence.
+_Avoid_: dynamic apps, script, generator.
+
+**Inert Entry**:
+A non-launchable Entry that surfaces a failure — rendered as a Cell in the grid but whose selection does nothing. Used as the error cell when a CommandSource fails (spawn error, non-zero exit, invalid JSON, or timeout).
+_Avoid_: error entry, dummy, placeholder.
+
 ## Relationships
 
 - A **Screen** bundles one **Category**'s resolved **Entries** with the **Theme**
-- A **Category** contains one or more **Entries**
-- An **Entry**'s launch intent resolves to an **Invocation**, which is then run (the spawn can fail; resolving cannot)
+- A **Category** contains one or more **Entries**, sourced either statically (EntryDefs) or from a **CommandSource**
+- A **CommandSource** yields **Entries** on success, or a single **Inert Entry** (the error cell) on failure
+- An **Entry**'s launch intent resolves to an **Invocation**, which is then run (the spawn can fail; resolving cannot); an **Inert Entry** has no launch intent
 - A **GridLayout** is built from a count of **Entries** and assigns each a coordinate and a **Layer**
 - A **Layer** maps to an **Accent**
 - A **Selection** wraps one **GridLayout** and renders one **Cell** per Entry
