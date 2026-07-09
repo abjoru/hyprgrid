@@ -16,13 +16,24 @@ pub struct EntryDef {
     pub terminal: bool,
 }
 
+/// TOML wire shape of a CommandSource: a Category whose Entries are produced
+/// by running `command` at startup and parsing its JSON stdout as EntryDefs.
+#[derive(Debug, Clone, Deserialize)]
+pub struct CommandSource {
+    pub command: String,
+}
+
 #[derive(Debug, Clone)]
 pub enum LaunchType {
     Command(String),
     Terminal(String),
+    /// A non-launchable Entry: selecting it in the grid is a no-op. Used for
+    /// the error cell a failing CommandSource resolves to.
+    Inert,
 }
 
-/// Runtime representation of a launchable entry.
+/// Runtime representation of an entry. Usually launchable; an [`Entry::inert`]
+/// carries [`LaunchType::Inert`] and only surfaces a failure.
 #[derive(Debug, Clone)]
 pub struct Entry {
     pub id: String,
@@ -32,8 +43,29 @@ pub struct Entry {
     pub icon: Option<String>,
 }
 
-/// On-disk map of every category to its EntryDefs; startup selects one.
+/// On-disk map of every static category to its EntryDefs; startup selects one.
 pub type CategoryMap = HashMap<String, Vec<EntryDef>>;
+
+/// On-disk map of every dynamic category to its CommandSource.
+pub type CommandMap = HashMap<String, CommandSource>;
+
+/// The outcome of running a CommandSource, produced by the I/O seam:
+/// `Ok(stdout)` — the command exited 0; `Err(reason)` — spawn error, non-zero
+/// exit, or timeout, with a human-readable reason.
+pub type CommandOutput = Result<String, String>;
+
+impl Entry {
+    /// A non-launchable error cell whose visible text conveys `message`.
+    pub fn inert(message: String) -> Entry {
+        Entry {
+            id: "__inert__".into(),
+            name: message,
+            description: None,
+            launch: LaunchType::Inert,
+            icon: None,
+        }
+    }
+}
 
 impl From<EntryDef> for Entry {
     fn from(def: EntryDef) -> Self {
@@ -59,6 +91,33 @@ pub fn entries_for_category(config: &CategoryMap, category: &str) -> Vec<Entry> 
         .get(category)
         .map(|defs| defs.iter().cloned().map(Entry::from).collect())
         .unwrap_or_default()
+}
+
+/// Pure core of CommandSource resolution: map a command's run outcome to
+/// Entries, or a single [`Entry::inert`] on any failure — bad outcome (spawn
+/// error, non-zero exit, timeout), invalid JSON, or a valid-but-empty array.
+/// The failure detail is logged to stderr and mirrored into the inert cell's
+/// text. Never returns an empty Vec, so the launcher window always opens.
+pub fn entries_from_command(category: &str, output: CommandOutput) -> Vec<Entry> {
+    let stdout = match output {
+        Ok(stdout) => stdout,
+        Err(reason) => {
+            log::error!("CommandSource '{}' failed: {}", category, reason);
+            return vec![Entry::inert(format!("{}: {}", category, reason))];
+        }
+    };
+
+    match serde_json::from_str::<Vec<EntryDef>>(&stdout) {
+        Ok(defs) if defs.is_empty() => {
+            log::error!("CommandSource '{}' produced no entries", category);
+            vec![Entry::inert(format!("{}: no entries", category))]
+        }
+        Ok(defs) => defs.into_iter().map(Entry::from).collect(),
+        Err(e) => {
+            log::error!("CommandSource '{}' emitted invalid JSON: {}", category, e);
+            vec![Entry::inert(format!("{}: invalid JSON: {}", category, e))]
+        }
+    }
 }
 
 #[cfg(test)]
@@ -115,5 +174,57 @@ mod tests {
         assert_eq!(out.len(), 2);
         assert_eq!(out[0].id, "a");
         assert_eq!(out[1].id, "b");
+    }
+
+    #[test]
+    fn command_valid_json_maps_entries_in_order() {
+        let json = r#"[
+            {"id":"ff","name":"Firefox","command":"firefox"},
+            {"id":"top","name":"Shell","command":"htop","terminal":true}
+        ]"#;
+        let out = entries_from_command("games", Ok(json.into()));
+        assert_eq!(out.len(), 2);
+        assert_eq!(out[0].id, "ff");
+        assert!(matches!(out[0].launch, LaunchType::Command(ref c) if c == "firefox"));
+        assert_eq!(out[1].id, "top");
+        assert!(matches!(out[1].launch, LaunchType::Terminal(ref c) if c == "htop"));
+    }
+
+    #[test]
+    fn command_honors_all_optional_fields() {
+        let json = r#"[{"id":"i","name":"N","command":"c","icon":"ic","description":"d"}]"#;
+        let out = entries_from_command("games", Ok(json.into()));
+        assert_eq!(out.len(), 1);
+        assert_eq!(out[0].icon.as_deref(), Some("ic"));
+        assert_eq!(out[0].description.as_deref(), Some("d"));
+    }
+
+    #[test]
+    fn command_failure_outcome_is_single_inert() {
+        let out = entries_from_command("games", Err("command not found".into()));
+        assert_eq!(out.len(), 1);
+        assert!(matches!(out[0].launch, LaunchType::Inert));
+        assert!(out[0].name.contains("command not found"));
+    }
+
+    #[test]
+    fn command_invalid_json_is_single_inert() {
+        let out = entries_from_command("games", Ok("not json".into()));
+        assert_eq!(out.len(), 1);
+        assert!(matches!(out[0].launch, LaunchType::Inert));
+    }
+
+    #[test]
+    fn command_missing_required_id_is_single_inert() {
+        let out = entries_from_command("games", Ok(r#"[{"name":"N","command":"c"}]"#.into()));
+        assert_eq!(out.len(), 1);
+        assert!(matches!(out[0].launch, LaunchType::Inert));
+    }
+
+    #[test]
+    fn command_empty_array_is_single_inert() {
+        let out = entries_from_command("games", Ok("[]".into()));
+        assert_eq!(out.len(), 1);
+        assert!(matches!(out[0].launch, LaunchType::Inert));
     }
 }

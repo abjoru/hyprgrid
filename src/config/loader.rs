@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use std::path::PathBuf;
 
-use super::types::CategoryMap;
+use super::types::{CategoryMap, CommandMap};
 use crate::theme::Theme;
 
 #[derive(Debug, Default, serde::Deserialize)]
@@ -10,6 +10,10 @@ pub struct ConfigFile {
     pub theme: Option<Theme>,
     #[serde(default)]
     pub apps: CategoryMap,
+    /// Dynamic categories sourced from a command's JSON stdout. A static
+    /// `[[apps.<name>]]` of the same name takes precedence.
+    #[serde(default)]
+    pub commands: CommandMap,
 }
 
 pub fn find_config(explicit: Option<&str>) -> Result<PathBuf> {

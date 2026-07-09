@@ -23,17 +23,21 @@ impl Invocation {
     ///
     /// For [`LaunchType::Terminal`] the checked binary is the *terminal*, not
     /// the app it hosts — the terminal is what must be on PATH.
+    ///
+    /// Returns `None` for [`LaunchType::Inert`]: an inert entry has no launch
+    /// intent, so selecting it is a no-op.
     pub fn resolve(
         launch: &LaunchType,
         default_terminal: Option<&str>,
         home: Option<&str>,
-    ) -> Invocation {
+    ) -> Option<Invocation> {
         let raw = match launch {
             LaunchType::Command(command) => command.clone(),
             LaunchType::Terminal(app) => {
                 let term = default_terminal.unwrap_or("kitty -e");
                 format!("{} {}", term, app)
             }
+            LaunchType::Inert => return None,
         };
 
         let command = expand_tilde(&raw, home);
@@ -43,7 +47,7 @@ impl Invocation {
             .unwrap_or(&command)
             .to_owned();
 
-        Invocation { command, binary }
+        Some(Invocation { command, binary })
     }
 }
 
@@ -100,14 +104,14 @@ mod tests {
 
     #[test]
     fn command_passes_through_verbatim() {
-        let inv = Invocation::resolve(&LaunchType::Command("foo".into()), None, None);
+        let inv = Invocation::resolve(&LaunchType::Command("foo".into()), None, None).unwrap();
         assert_eq!(inv.command, "foo");
         assert_eq!(inv.binary, "foo");
     }
 
     #[test]
     fn terminal_uses_default_fallback() {
-        let inv = Invocation::resolve(&LaunchType::Terminal("foo".into()), None, None);
+        let inv = Invocation::resolve(&LaunchType::Terminal("foo".into()), None, None).unwrap();
         assert_eq!(inv.command, "kitty -e foo");
         assert_eq!(inv.binary, "kitty");
     }
@@ -118,7 +122,8 @@ mod tests {
             &LaunchType::Terminal("foo".into()),
             Some("alacritty -e"),
             None,
-        );
+        )
+        .unwrap();
         assert_eq!(inv.command, "alacritty -e foo");
         // The terminal is the checked binary, not the hosted app.
         assert_eq!(inv.binary, "alacritty");
@@ -126,20 +131,27 @@ mod tests {
 
     #[test]
     fn tilde_expands_against_home() {
-        let inv = Invocation::resolve(&LaunchType::Command("~/x".into()), None, Some("/h/me"));
+        let inv =
+            Invocation::resolve(&LaunchType::Command("~/x".into()), None, Some("/h/me")).unwrap();
         assert_eq!(inv.command, "/h/me/x");
         assert_eq!(inv.binary, "/h/me/x");
     }
 
     #[test]
     fn tilde_left_literal_without_home() {
-        let inv = Invocation::resolve(&LaunchType::Command("~/x".into()), None, None);
+        let inv = Invocation::resolve(&LaunchType::Command("~/x".into()), None, None).unwrap();
         assert_eq!(inv.command, "~/x");
     }
 
     #[test]
     fn binary_is_first_whitespace_token() {
-        let inv = Invocation::resolve(&LaunchType::Command("foo --bar baz".into()), None, None);
+        let inv =
+            Invocation::resolve(&LaunchType::Command("foo --bar baz".into()), None, None).unwrap();
         assert_eq!(inv.binary, "foo");
+    }
+
+    #[test]
+    fn inert_has_no_invocation() {
+        assert!(Invocation::resolve(&LaunchType::Inert, None, None).is_none());
     }
 }

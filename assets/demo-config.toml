@@ -9,6 +9,15 @@ icon_size = 32
 icons_enabled = true
 dim_strength = 0.8
 
+# A CommandSource category: its Entries are produced at startup by running a
+# command whose stdout is a JSON array of the same shape as [[apps.<cat>]].
+# A static [[apps.<cat>]] of the same name takes precedence. On failure
+# (spawn error, non-zero exit, invalid JSON, or ~5s timeout) a single inert
+# error cell is shown and the failure is logged to stderr.
+#
+# [commands.games]
+# command = "~/bin/list-games.sh"   # e.g. prints: [{"id":"ff","name":"Firefox","command":"firefox"}]
+
 [[apps.demo]]
 id = "firefox"
 name = "Firefox"

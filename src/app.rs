@@ -76,14 +76,16 @@ pub fn run(config: AppConfig) -> Result<()> {
                 Action::Launch => {
                     if let Some(entry) = state_clone.current_entry() {
                         let home = std::env::var("HOME").ok();
-                        let inv = Invocation::resolve(
+                        // `None` for an inert error cell — selecting it is a no-op.
+                        if let Some(inv) = Invocation::resolve(
                             &entry.launch,
                             terminal_clone.as_deref(),
                             home.as_deref(),
-                        );
-                        match launcher::run(&inv) {
-                            Ok(_) => window_clone.close(),
-                            Err(e) => report_launch_error(&entry.name, &e),
+                        ) {
+                            match launcher::run(&inv) {
+                                Ok(_) => window_clone.close(),
+                                Err(e) => report_launch_error(&entry.name, &e),
+                            }
                         }
                     }
                 }
